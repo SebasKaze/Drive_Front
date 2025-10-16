@@ -5,7 +5,7 @@ export default function Navbar() {
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
           <img src="/drive-icon.png" alt="Drive" className="w-6 h-6 filter brightness-0 invert" />
         </div>
-        <h1 className="text-xl font-bold text-gray-800">Cloud Storage</h1>
+        <h1 className="text-xl font-bold text-gray-800">Drive</h1>
       </div>
       <div className="flex items-center space-x-4">
         <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-lg">
