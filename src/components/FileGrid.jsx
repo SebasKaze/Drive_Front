@@ -1,37 +1,31 @@
-import { File, Folder, MoreVertical } from "lucide-react";
+import { Folder, File } from "lucide-react";
 
 export default function FileGrid({ folder }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-      {folder.subfolders?.map((sub) => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      {/* Carpetas */}
+      {folder.subfolders?.map((subfolder, index) => (
         <div
-          key={sub.name}
-          className="bg-white group border border-gray-200 rounded-xl p-4 hover:shadow-xl cursor-pointer transition-all duration-300 hover:-translate-y-1"
+          key={index}
+          className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-100 transition-colors"
         >
-          <div className="flex justify-between items-start mb-3">
-            <Folder className="w-10 h-10 text-blue-500" />
-            <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 hover:bg-gray-100 rounded">
-              <MoreVertical className="w-4 h-4 text-gray-500" />
-            </button>
-          </div>
-          <p className="font-medium text-gray-800 truncate">{sub.name}</p>
-          <p className="text-xs text-gray-500 mt-1">Carpeta</p>
+          <Folder className="w-12 h-12 text-blue-500 mb-2" />
+          <span className="text-sm font-medium text-gray-800 text-center truncate w-full">
+            {subfolder.name}
+          </span>
         </div>
       ))}
-
-      {folder.files?.map((file) => (
+      
+      {/* Archivos */}
+      {folder.files?.map((file, index) => (
         <div
-          key={file.name}
-          className="bg-white group border border-gray-200 rounded-xl p-4 hover:shadow-xl cursor-pointer transition-all duration-300 hover:-translate-y-1"
+          key={index}
+          className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors"
         >
-          <div className="flex justify-between items-start mb-3">
-            <File className="w-10 h-10 text-green-500" />
-            <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 hover:bg-gray-100 rounded">
-              <MoreVertical className="w-4 h-4 text-gray-500" />
-            </button>
-          </div>
-          <p className="font-medium text-gray-800 truncate">{file.name}</p>
-          <p className="text-xs text-gray-500 mt-1">Archivo</p>
+          <File className="w-12 h-12 text-gray-500 mb-2" />
+          <span className="text-sm font-medium text-gray-800 text-center truncate w-full">
+            {file.name}
+          </span>
         </div>
       ))}
     </div>

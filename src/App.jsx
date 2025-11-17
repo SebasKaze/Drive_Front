@@ -6,7 +6,7 @@ import Login from "./pages/Login";
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 bg-fixed">
+      <div className="min-h-screen bg-sky-200 bg-fixed">
         <Navbar />
         <div className="p-4">
           <Routes>
