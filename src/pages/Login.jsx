@@ -1,4 +1,13 @@
 import { useState } from 'react';
+import {
+  Box,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  CircularProgress
+} from '@mui/material';
 
 export default function Login() {
   const backConection = import.meta.env.VITE_BACK_URL;
@@ -25,20 +34,15 @@ export default function Login() {
     try {
       const response = await fetch(`${backConection}/api/users/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        // Login exitoso - guardar usuario en localStorage o context
         localStorage.setItem('user', JSON.stringify(data.user));
-        // Redirigir o actualizar estado de la app
-        console.log('Login exitoso:', data.user);
-        window.location.href = '/dashboard'; // o usa tu router
+        window.location.href = '/dashboard';
       } else {
         setError(data.message || 'Error en el login');
       }
@@ -51,57 +55,80 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center">
-      <div className="max-w-md w-full mx-auto bg-white/95 backdrop-blur-sm p-8 rounded-xl shadow-2xl border border-white/20">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">Iniciar Sesión</h2>
-          <p className="text-gray-600">Accede a tu espacio de trabajo</p>
-        </div>
-        
+    <Box
+      sx={{
+        minHeight: '80vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: '#f3f4f6'
+      }}
+    >
+      <Paper
+        elevation={6}
+        sx={{
+          maxWidth: 400,
+          width: '100%',
+          p: 4,
+          borderRadius: 3
+        }}
+      >
+        <Typography variant="h4" align="center" fontWeight="bold" mb={1}>
+          Iniciar Sesión
+        </Typography>
+        <Typography variant="body2" align="center" mb={3} color="text.secondary">
+          Accede a tu espacio de trabajo
+        </Typography>
+
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <Alert severity="error" sx={{ mb: 2 }}>
             {error}
-          </div>
+          </Alert>
         )}
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Usuario
-            </label>
-            <input
-              type="text"
-              name="username"
-              placeholder="Ingresa tu usuario"
-              className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Ingresa tu contraseña"
-              className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <button 
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Usuario"
+            name="username"
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
+
+          <TextField
+            label="Contraseña"
+            name="password"
+            type="password"
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+
+          <Button
             type="submit"
+            fullWidth
+            variant="contained"
+            sx={{
+              mt: 3,
+              py: 1.4,
+              fontWeight: 'bold',
+              background: 'linear-gradient(45deg, #1e40af, #7e22ce)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #1e3a8a, #6b21a8)'
+              }
+            }}
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Verificando...' : 'Entrar al Sistema'}
-          </button>
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Entrar al Sistema'}
+          </Button>
         </form>
-      </div>
-    </div>
+      </Paper>
+    </Box>
   );
 }

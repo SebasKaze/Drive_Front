@@ -1,25 +1,105 @@
-export default function Navbar() {
+// components/Navbar.jsx
+import { AppBar, Toolbar, Box, Typography, Button, IconButton, Avatar, useMediaQuery } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+
+const Navbar = () => {
+  const isDesktop = useMediaQuery("(min-width:768px)");
+
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200 flex items-center justify-between px-6 py-4">
-      <div className="flex items-center space-x-3">
-        <div className="bg-blue-500 p-2 rounded-lg">
-          <img src="/drive-icon.png" alt="Drive" className="w-6 h-6 filter brightness-0 invert" />
-        </div>
-        <h1 className="text-xl font-bold text-gray-800">Drive</h1>
-      </div>
-      <div className="flex items-center space-x-4">
-        <button className="bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transform hover:-translate-y-0.5 transition-all duration-200 shadow-sm">
-          + Nuevo Archivo
-        </button>
-        <div className="flex items-center space-x-3 bg-gray-50 rounded-full pl-3 pr-1 py-1 border border-gray-300">
-          <span className="text-sm font-medium text-gray-700">Admin</span>
-          <img
-            src="https://i.pravatar.cc/40"
-            alt="User"
-            className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
-          />
-        </div>
-      </div>
-    </nav>
+    <AppBar
+      position="static"
+      elevation={1}
+      sx={{
+        backgroundColor: "white",
+        borderBottom: "1px solid #e5e7eb",
+        color: "black",
+      }}
+    >
+      <Toolbar sx={{ maxWidth: "1400px", mx: "auto", width: "100%" }}>
+        {/* Logo + Nombre */}
+        <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+          <IconButton
+            component={RouterLink}
+            to="/"
+            sx={{
+              backgroundColor: "#2563eb",
+              width: 40,
+              height: 40,
+              borderRadius: 2,
+              "&:hover": { backgroundColor: "#1e40af" }
+            }}
+          >
+            <Typography sx={{ color: "white", fontWeight: "bold" }}>C</Typography>
+          </IconButton>
+
+          <Typography
+            variant="h6"
+            component={RouterLink}
+            to="/"
+            sx={{
+              textDecoration: "none",
+              color: "black",
+              fontWeight: "bold",
+              ml: 2,
+              fontSize: "1.4rem"
+            }}
+          >
+            CMB Drive
+          </Typography>
+
+          {/* Links */}
+          {isDesktop && (
+            <Box sx={{ display: "flex", ml: 5, gap: 4 }}>
+              <Typography
+                component={RouterLink}
+                to="/dashboard"
+                sx={{
+                  textDecoration: "none",
+                  color: "gray",
+                  fontSize: "1rem",
+                  "&:hover": { color: "#2563eb" }
+                }}
+              >
+                Mi Drive
+              </Typography>
+
+              <Typography
+                component={RouterLink}
+                to="/"
+                sx={{
+                  textDecoration: "none",
+                  color: "gray",
+                  fontSize: "1rem",
+                  "&:hover": { color: "#2563eb" }
+                }}
+              >
+                Inicio
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        {/* Botón derecho */}
+        <Button
+          component={RouterLink}
+          to="/login"
+          variant="contained"
+          sx={{
+            background: "linear-gradient(45deg, #1e40af, #6d28d9)",
+            px: 3,
+            py: 1,
+            fontWeight: "bold",
+            borderRadius: 2,
+            "&:hover": {
+              background: "linear-gradient(45deg, #1e3a8a, #5b21b6)"
+            }
+          }}
+        >
+          Mi perfil
+        </Button>
+      </Toolbar>
+    </AppBar>
   );
-}
+};
+
+export default Navbar;

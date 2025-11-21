@@ -1,104 +1,158 @@
-import { useState } from "react";
-import { Folder, Home, Plus, File, Upload } from "lucide-react";
-import UploadModal from "./UploadModal";
+// components/Sidebar.jsx
+import {
+  Box,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Typography,
+  Avatar,
+  LinearProgress,
+} from "@mui/material";
 
-export default function Sidebar({ folders, onSelectFolder }) {
-  const [selected, setSelected] = useState("root");
-  const [showMenu, setShowMenu] = useState(false);
-  const [showUploadModal, setShowUploadModal] = useState(false);
+import StorageOutlinedIcon from "@mui/icons-material/StorageOutlined";
+import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 
-  const handleClick = (folder) => {
-    setSelected(folder.name);
-    onSelectFolder(folder);
-  };
-
-  const handleUpload = (fileData) => {
-    // Aquí puedes manejar los datos del archivo subido
-    console.log("Datos del archivo en JSON:", JSON.stringify(fileData, null, 2));
-    
-    // Aquí podrías agregar la lógica para guardar el archivo en tu estado
-    // Por ejemplo, actualizar la lista de archivos en la carpeta actual
-    alert(`Archivo subido:\n${JSON.stringify(fileData, null, 2)}`);
-  };
+const Sidebar = ({ folders, currentView, onViewChange, onFolderSelect }) => {
+  const menuItems = [
+    { id: "mi-unidad", label: "Mi Unidad", icon: <StorageOutlinedIcon /> },
+    { id: "compartidos", label: "Compartidos", icon: <GroupOutlinedIcon /> },
+    { id: "recientes", label: "Recientes", icon: <AccessTimeOutlinedIcon /> },
+    { id: "papelera", label: "Papelera", icon: <DeleteOutlineIcon /> },
+  ];
 
   return (
-    <>
-      <aside className="w-64 bg-white shadow-sm border-r border-gray-200 h-[calc(100vh-4rem)] p-6">
-        <div className="mb-6 relative">
-          <button 
-            onClick={() => setShowMenu(!showMenu)}
-            className="w-full bg-orange-500 text-white py-2 px-4 rounded-lg font-semibold flex items-center justify-center space-x-2 hover:bg-orange-600 transition-all duration-200"
+    <Box
+      sx={{
+        width: 260,
+        backgroundColor: "white",
+        borderRight: "1px solid #e5e7eb",
+        minHeight: "100vh",
+        p: 2,
+      }}
+    >
+      {/* MENU PRINCIPAL */}
+      <List sx={{ mb: 2 }}>
+        {menuItems.map((item) => (
+          <ListItemButton
+            key={item.id}
+            onClick={() => onViewChange(item.id)}
+            sx={{
+              borderRadius: 2,
+              mb: 0.5,
+              ...(currentView === item.id
+                ? {
+                    backgroundColor: "#eff6ff",
+                    border: "1px solid #bfdbfe",
+                    color: "#2563eb",
+                  }
+                : {
+                    "&:hover": { backgroundColor: "#f8fafc" },
+                  }),
+            }}
           >
-            <Plus className="w-4 h-4" />
-            <span>Nuevo</span>
-          </button>
-          
-          {/* Menú desplegable */}
-          {showMenu && (
-            <div className="absolute top-12 left-0 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-              <button className="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 text-gray-700 transition-colors">
-                <Folder className="w-5 h-5 text-blue-500" />
-                <span>Nueva Carpeta</span>
-              </button>
-              <button 
-                onClick={() => {
-                  setShowMenu(false);
-                  setShowUploadModal(true);
-                }}
-                className="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 text-gray-700 transition-colors"
-              >
-                <File className="w-5 h-5 text-blue-500" />
-                <span>Nuevo Archivo</span>
-              </button>
-              <button className="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 text-gray-700 transition-colors">
-                <Upload className="w-5 h-5 text-blue-500" />
-                <span>Subir Archivo</span>
-              </button>
-            </div>
-          )}
-        </div>
-        
-        <div className="space-y-1">
-          <button
-            onClick={() => handleClick({ name: "Mi Unidad", subfolders: folders, files: [] })}
-            className={`flex items-center space-x-3 w-full p-3 rounded-lg transition-all duration-200 ${
-              selected === "root" 
-                ? "bg-blue-100 text-blue-700 border border-blue-300" 
-                : "hover:bg-gray-50 text-gray-700"
-            }`}
+            <ListItemIcon
+              sx={{
+                minWidth: 36,
+                color: currentView === item.id ? "#2563eb" : "gray",
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+
+            <ListItemText
+              primary={item.label}
+              primaryTypographyProps={{
+                fontWeight: currentView === item.id ? "bold" : "medium",
+              }}
+            />
+          </ListItemButton>
+        ))}
+      </List>
+
+      <Divider sx={{ my: 2 }} />
+
+      {/* CARPETAS */}
+      <Typography
+        sx={{ color: "gray", fontSize: 13, fontWeight: "bold", px: 1, mb: 1 }}
+      >
+        Carpetas
+      </Typography>
+
+      <List>
+        {folders.map((folder) => (
+          <ListItemButton
+            key={folder.id}
+            onClick={() => onFolderSelect(folder)}
+            sx={{
+              borderRadius: 2,
+              mb: 0.5,
+              "&:hover": { backgroundColor: "#f8fafc" },
+            }}
           >
-            <Home className="w-5 h-5" />
-            <span className="font-medium">Mi Unidad</span>
-          </button>
+            <ListItemIcon sx={{ minWidth: 36 }}>
+              <FolderOutlinedIcon />
+            </ListItemIcon>
 
-          <div className="pt-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
-              Carpetas
-            </h3>
-            {folders.map((folder) => (
-              <button
-                key={folder.name}
-                onClick={() => handleClick(folder)}
-                className={`flex items-center space-x-3 w-full p-3 rounded-lg transition-all duration-200 ${
-                  selected === folder.name 
-                    ? "bg-blue-100 text-blue-700 border border-blue-300" 
-                    : "hover:bg-gray-50 text-gray-700"
-                }`}
-              >
-                <Folder className="w-5 h-5" />
-                <span className="font-medium">{folder.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </aside>
+            <Box sx={{ flexGrow: 1 }}>
+              <Typography fontWeight="medium">{folder.name}</Typography>
+              <Typography variant="caption" color="gray">
+                {folder.itemCount} elementos
+              </Typography>
+            </Box>
+          </ListItemButton>
+        ))}
+      </List>
 
-      {/* Modal para subir archivos */}
-      <UploadModal 
-        isOpen={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
-        onUpload={handleUpload}
-      />
-    </>
+      {/* ESPACIO UTILIZADO */}
+      <Box
+        sx={{
+          mt: 4,
+          p: 2,
+          backgroundColor: "#f8fafc",
+          borderRadius: 2,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          <Avatar
+            sx={{
+              bgcolor: "#dbeafe",
+              width: 32,
+              height: 32,
+              mr: 1.5,
+            }}
+          >
+            <StorageOutlinedIcon sx={{ color: "#2563eb", fontSize: 18 }} />
+          </Avatar>
+
+          <Box>
+            <Typography fontSize={14} fontWeight="bold" color="gray.800">
+              Almacenamiento
+            </Typography>
+            <Typography fontSize={12} color="gray.600">
+              2.5 GB de 15 GB usados
+            </Typography>
+          </Box>
+        </Box>
+
+        <LinearProgress
+          variant="determinate"
+          value={16.6}
+          sx={{
+            height: 8,
+            borderRadius: 4,
+            "& .MuiLinearProgress-bar": {
+              backgroundColor: "#2563eb",
+            },
+          }}
+        />
+      </Box>
+    </Box>
   );
-}
+};
+
+export default Sidebar;
