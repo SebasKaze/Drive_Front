@@ -1,9 +1,49 @@
-// components/Navbar.jsx
-import { AppBar, Toolbar, Box, Typography, Button, IconButton, Avatar, useMediaQuery } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Box,
+  Typography,
+  Button,
+  IconButton,
+  Avatar,
+  Menu,
+  MenuItem,
+  Divider,
+  useMediaQuery
+} from "@mui/material";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const isDesktop = useMediaQuery("(min-width:768px)");
+  const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth()
+
+
+  const drivePath =
+    profile?.tipo === "admin"
+      ? "/admin"
+      : profile?.tipo === "user"
+      ? "/user"
+      : "/login";
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleOpenMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    await signOut()
+    handleCloseMenu()
+    navigate("/login")
+  }
 
   return (
     <AppBar
@@ -29,7 +69,9 @@ const Navbar = () => {
               "&:hover": { backgroundColor: "#1e40af" }
             }}
           >
-            <Typography sx={{ color: "white", fontWeight: "bold" }}>C</Typography>
+            <Typography component="div" sx={{ color: "white", fontWeight: "bold" }}>
+              C
+            </Typography>
           </IconButton>
 
           <Typography
@@ -50,18 +92,18 @@ const Navbar = () => {
           {/* Links */}
           {isDesktop && (
             <Box sx={{ display: "flex", ml: 5, gap: 4 }}>
-              <Typography
-                component={RouterLink}
-                to="/dashboard"
-                sx={{
-                  textDecoration: "none",
-                  color: "gray",
-                  fontSize: "1rem",
-                  "&:hover": { color: "#2563eb" }
-                }}
-              >
-                Mi Drive
-              </Typography>
+            <Typography
+              component={RouterLink}
+              to={drivePath}
+              sx={{
+                textDecoration: "none",
+                color: "gray",
+                fontSize: "1rem",
+                "&:hover": { color: "#2563eb" }
+              }}
+            >
+              Mi Drive
+            </Typography>
 
               <Typography
                 component={RouterLink}
@@ -79,24 +121,56 @@ const Navbar = () => {
           )}
         </Box>
 
-        {/* Botón derecho */}
+        {/* ===== OPCIONES ===== */}
         <Button
-          component={RouterLink}
-          to="/login"
-          variant="contained"
+          onClick={handleOpenMenu}
+          startIcon={
+          <Avatar sx={{ width: 28, height: 28 }}>
+            {user?.email?.[0]?.toUpperCase() || "U"}
+          </Avatar>
+          }
           sx={{
-            background: "linear-gradient(45deg, #1e40af, #6d28d9)",
-            px: 3,
-            py: 1,
+            textTransform: "none",
             fontWeight: "bold",
-            borderRadius: 2,
-            "&:hover": {
-              background: "linear-gradient(45deg, #1e3a8a, #5b21b6)"
-            }
+            color: "black"
           }}
         >
-          Mi perfil
+          Opciones
         </Button>
+
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleCloseMenu}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+        <MenuItem
+          onClick={() => {
+            navigate(drivePath)
+            handleCloseMenu()
+          }}>
+          Mi Drive
+        </MenuItem>
+
+          <MenuItem
+            onClick={() => {
+              navigate("/perfil");
+              handleCloseMenu();
+            }}
+          >
+            Mi Perfil
+          </MenuItem>
+
+          <Divider />
+
+          <MenuItem
+            onClick={handleLogout}
+            sx={{ color: "error.main", fontWeight: "bold" }}
+          >
+            Cerrar sesión
+          </MenuItem>
+        </Menu>
       </Toolbar>
     </AppBar>
   );

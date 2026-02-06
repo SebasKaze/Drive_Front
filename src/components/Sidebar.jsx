@@ -1,158 +1,152 @@
-// components/Sidebar.jsx
+import { useEffect, useState } from "react"
 import {
   Box,
+  Typography,
+  Divider,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
-  Typography,
-  Avatar,
-  LinearProgress,
-} from "@mui/material";
+  Button,
+  CircularProgress
+} from "@mui/material"
 
-import StorageOutlinedIcon from "@mui/icons-material/StorageOutlined";
-import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
-import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
+import HomeIcon from "@mui/icons-material/Home"
+import AccessTimeIcon from "@mui/icons-material/AccessTime"
+import DeleteIcon from "@mui/icons-material/Delete"
+import FolderIcon from "@mui/icons-material/Folder"
+import BusinessIcon from "@mui/icons-material/Business"
 
-const Sidebar = ({ folders, currentView, onViewChange, onFolderSelect }) => {
-  const menuItems = [
-    { id: "mi-unidad", label: "Mi Unidad", icon: <StorageOutlinedIcon /> },
-    { id: "compartidos", label: "Compartidos", icon: <GroupOutlinedIcon /> },
-    { id: "recientes", label: "Recientes", icon: <AccessTimeOutlinedIcon /> },
-    { id: "papelera", label: "Papelera", icon: <DeleteOutlineIcon /> },
-  ];
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
+import { supabase } from "../supabase"
+
+const Sidebar = () => {
+  const navigate = useNavigate()
+  const { isAdmin } = useAuth()
+
+  const [folders, setFolders] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  /* =========================
+     CARGAR CARPETAS RAÍZ (ADMIN)
+  ========================= */
+  useEffect(() => {
+    if (isAdmin) {
+      fetchRootFolders()
+    }
+  }, [isAdmin])
+
+  const fetchRootFolders = async () => {
+    setLoading(true)
+
+    const { data, error } = await supabase
+      .from("carpeta")
+      .select("id_carpeta, nombre")
+      .is("padre", null)
+      .order("nombre")
+
+    if (error) {
+      console.error("❌ Error cargando carpetas raíz:", error)
+    } else {
+      setFolders(data || [])
+    }
+
+    setLoading(false)
+  }
 
   return (
     <Box
       sx={{
         width: 260,
-        backgroundColor: "white",
+        height: "100vh",
         borderRight: "1px solid #e5e7eb",
-        minHeight: "100vh",
-        p: 2,
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.paper"
       }}
     >
-      {/* MENU PRINCIPAL */}
-      <List sx={{ mb: 2 }}>
-        {menuItems.map((item) => (
-          <ListItemButton
-            key={item.id}
-            onClick={() => onViewChange(item.id)}
-            sx={{
-              borderRadius: 2,
-              mb: 0.5,
-              ...(currentView === item.id
-                ? {
-                    backgroundColor: "#eff6ff",
-                    border: "1px solid #bfdbfe",
-                    color: "#2563eb",
-                  }
-                : {
-                    "&:hover": { backgroundColor: "#f8fafc" },
-                  }),
-            }}
+      {/* ===== HEADER ===== */}
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h6" fontWeight="bold" component="div">
+          CMB Drive
+        </Typography>
+
+        <Typography variant="caption" color="text.secondary" component="div">
+          {isAdmin ? "Administrador" : "Usuario"}
+        </Typography>
+
+        {isAdmin && (
+          <Button
+            fullWidth
+            startIcon={<BusinessIcon />}
+            variant="contained"
+            sx={{ mt: 2 }}
+            onClick={() => navigate("/admin/crear-empresa")}
           >
-            <ListItemIcon
-              sx={{
-                minWidth: 36,
-                color: currentView === item.id ? "#2563eb" : "gray",
-              }}
-            >
-              {item.icon}
-            </ListItemIcon>
+            Crear empresa
+          </Button>
+        )}
+      </Box>
 
-            <ListItemText
-              primary={item.label}
-              primaryTypographyProps={{
-                fontWeight: currentView === item.id ? "bold" : "medium",
-              }}
-            />
-          </ListItemButton>
-        ))}
-      </List>
+      <Divider />
 
-      <Divider sx={{ my: 2 }} />
-
-      {/* CARPETAS */}
-      <Typography
-        sx={{ color: "gray", fontSize: 13, fontWeight: "bold", px: 1, mb: 1 }}
-      >
-        Carpetas
-      </Typography>
-
+      {/* ===== NAV ===== */}
       <List>
-        {folders.map((folder) => (
-          <ListItemButton
-            key={folder.id}
-            onClick={() => onFolderSelect(folder)}
-            sx={{
-              borderRadius: 2,
-              mb: 0.5,
-              "&:hover": { backgroundColor: "#f8fafc" },
-            }}
-          >
-            <ListItemIcon sx={{ minWidth: 36 }}>
-              <FolderOutlinedIcon />
-            </ListItemIcon>
+        <ListItemButton onClick={() => navigate("/")}>
+          <ListItemIcon><HomeIcon /></ListItemIcon>
+          <ListItemText primary="Inicio" />
+        </ListItemButton>
 
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography fontWeight="medium">{folder.name}</Typography>
-              <Typography variant="caption" color="gray">
-                {folder.itemCount} elementos
-              </Typography>
-            </Box>
-          </ListItemButton>
-        ))}
+        <ListItemButton onClick={() => navigate("/")}>
+          <ListItemIcon><AccessTimeIcon /></ListItemIcon>
+          <ListItemText primary="Recientes" />
+        </ListItemButton>
+
+        <ListItemButton onClick={() => navigate("/")}>
+          <ListItemIcon><DeleteIcon /></ListItemIcon>
+          <ListItemText primary="Papelera" />
+        </ListItemButton>
       </List>
 
-      {/* ESPACIO UTILIZADO */}
-      <Box
-        sx={{
-          mt: 4,
-          p: 2,
-          backgroundColor: "#f8fafc",
-          borderRadius: 2,
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <Avatar
-            sx={{
-              bgcolor: "#dbeafe",
-              width: 32,
-              height: 32,
-              mr: 1.5,
-            }}
-          >
-            <StorageOutlinedIcon sx={{ color: "#2563eb", fontSize: 18 }} />
-          </Avatar>
+      <Divider />
 
-          <Box>
-            <Typography fontSize={14} fontWeight="bold" color="gray.800">
-              Almacenamiento
-            </Typography>
-            <Typography fontSize={12} color="gray.600">
-              2.5 GB de 15 GB usados
+      {/* ===== CARPETAS RAÍZ (ADMIN) ===== */}
+      {isAdmin && (
+        <Box sx={{ flexGrow: 1, overflow: "auto" }}>
+          <Box sx={{ px: 2, py: 1 }}>
+            <Typography component="div" variant="subtitle2" fontWeight="bold">
+              CARPETAS
             </Typography>
           </Box>
+
+          {loading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
+              <CircularProgress size={22} />
+            </Box>
+          ) : folders.length === 0 ? (
+            <Typography component="div" variant="body2" color="text.secondary" sx={{ px: 2 }}>
+              No hay carpetas raíz
+            </Typography>
+          ) : (
+            <List>
+              {folders.map(folder => (
+                <ListItemButton
+                  key={folder.id_carpeta}
+                  onClick={() =>
+                    navigate(`/dashboard/carpeta/${folder.id_carpeta}`)
+                  }
+                >
+                  <ListItemIcon><FolderIcon /></ListItemIcon>
+                  <ListItemText primary={folder.nombre} />
+                </ListItemButton>
+              ))}
+            </List>
+          )}
         </Box>
-
-        <LinearProgress
-          variant="determinate"
-          value={16.6}
-          sx={{
-            height: 8,
-            borderRadius: 4,
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: "#2563eb",
-            },
-          }}
-        />
-      </Box>
+      )}
     </Box>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

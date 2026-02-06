@@ -28,14 +28,9 @@ const Header = ({ searchQuery, onSearchChange, currentView }) => {
 
         {/* Botones de acción */}
         <button className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          <Plus className="w-4 h-4" />
-          <span>Nuevo</span>
+          <span>Buscar</span>
         </button>
 
-        <button className="flex items-center space-x-2 bg-white text-gray-700 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">
-          <Upload className="w-4 h-4" />
-          <span>Subir</span>
-        </button>
       </div>
     </div>
   );
