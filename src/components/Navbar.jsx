@@ -70,10 +70,9 @@ const Navbar = () => {
             }}
           >
             <Typography component="div" sx={{ color: "white", fontWeight: "bold" }}>
-              C
+              D
             </Typography>
           </IconButton>
-
           <Typography
             variant="h6"
             component={RouterLink}
@@ -88,23 +87,9 @@ const Navbar = () => {
           >
             CMB Drive
           </Typography>
-
           {/* Links */}
           {isDesktop && (
             <Box sx={{ display: "flex", ml: 5, gap: 4 }}>
-            <Typography
-              component={RouterLink}
-              to={drivePath}
-              sx={{
-                textDecoration: "none",
-                color: "gray",
-                fontSize: "1rem",
-                "&:hover": { color: "#2563eb" }
-              }}
-            >
-              Mi Drive
-            </Typography>
-
               <Typography
                 component={RouterLink}
                 to="/"
@@ -117,25 +102,48 @@ const Navbar = () => {
               >
                 Inicio
               </Typography>
+              <Typography
+                component={RouterLink}
+                to={drivePath}
+                sx={{
+                  textDecoration: "none",
+                  color: "gray",
+                  fontSize: "1rem",
+                  "&:hover": { color: "#2563eb" }
+                }}
+              >
+                Mi Drive
+              </Typography>
             </Box>
           )}
         </Box>
-
         {/* ===== OPCIONES ===== */}
+        {/* ===== BOTÓN PERFIL ===== */}
         <Button
           onClick={handleOpenMenu}
-          startIcon={
-          <Avatar sx={{ width: 28, height: 28 }}>
-            {user?.email?.[0]?.toUpperCase() || "U"}
-          </Avatar>
-          }
           sx={{
             textTransform: "none",
-            fontWeight: "bold",
-            color: "black"
+            fontWeight: 500,
+            color: "black",
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5
           }}
         >
-          Opciones
+          <Avatar sx={{ width: 32, height: 32 }}>
+            {profile?.nombre?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
+          </Avatar>
+
+          {isDesktop && (
+            <Box sx={{ textAlign: "left" }}>
+              <Typography variant="body2" fontWeight="bold">
+                {profile?.nombre || "Usuario"}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {profile?.tipo}
+              </Typography>
+            </Box>
+          )}
         </Button>
 
         <Menu
@@ -144,14 +152,26 @@ const Navbar = () => {
           onClose={handleCloseMenu}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           transformOrigin={{ vertical: "top", horizontal: "right" }}
+          PaperProps={{
+            sx: {
+              mt: 1,
+              borderRadius: 2,
+              minWidth: 220,
+              p: 1
+            }
+          }}
         >
-        <MenuItem
-          onClick={() => {
-            navigate(drivePath)
-            handleCloseMenu()
-          }}>
-          Mi Drive
-        </MenuItem>
+          {/* Header usuario */}
+          <Box sx={{ px: 2, py: 1 }}>
+            <Typography fontWeight="bold">
+              {profile?.nombre}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {user?.email}
+            </Typography>
+          </Box>
+
+          <Divider sx={{ my: 1 }} />
 
           <MenuItem
             onClick={() => {
@@ -162,15 +182,16 @@ const Navbar = () => {
             Mi Perfil
           </MenuItem>
 
-          <Divider />
+          <Divider sx={{ my: 1 }} />
 
           <MenuItem
             onClick={handleLogout}
-            sx={{ color: "error.main", fontWeight: "bold" }}
+            sx={{ color: "error.main", fontWeight: 500 }}
           >
             Cerrar sesión
           </MenuItem>
         </Menu>
+
       </Toolbar>
     </AppBar>
   );

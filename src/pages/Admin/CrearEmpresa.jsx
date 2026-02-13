@@ -6,20 +6,22 @@ import {
   Typography,
   Paper,
   Stack,
+  Alert,
 } from "@mui/material";
-import { supabase } from "../../supabase"
 
-
+import { supabase } from "../../supabase";
 
 export default function CrearEmpresa() {
-
   const [form, setForm] = useState({
     empresa: "",
     nombre: "",
     correo: "",
-    password: "",
     ruta: "",
   });
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({
@@ -29,63 +31,79 @@ export default function CrearEmpresa() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess(false);
 
     try {
-      // 0️⃣ Usuario autenticado
       const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser()
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (userError || !user) throw userError
+      if (!session) throw new Error("Usuario no autenticado");
 
-      // 1️⃣ Crear EMPRESA
-      const { data: empresa, error: empresaError } = await supabase
-        .from("empresa")
-        .insert({
-          nombre: form.empresa,
-          tipo: "empresa", // o "cliente", o lo que definas
-        })
-        .select()
-        .single()
+      const res = await fetch(
+        "http://localhost:4000/empresa/crear",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            empresa_nombre: form.empresa,
+            empresa_tipo: "empresa",
+            usuario_nombre: form.nombre,
+            usuario_email: form.correo,
+            usuario_tipo: "user",
+            carpeta_nombre: form.ruta,
+          }),
+        }
+      );
 
-      if (empresaError) throw empresaError
+      const data = await res.json();
 
-      // 3️⃣ Crear CARPETA RAÍZ
-      const { error: carpetaError } = await supabase
-        .from("carpeta")
-        .insert({
-          nombre: form.ruta,
-          padre: null,
-          id_usuario_fk: user.id,
-          
-        })
+      if (!res.ok) {
+        throw new Error(data.error || "Error al crear empresa");
+      }
 
-      if (carpetaError) throw carpetaError
+      setSuccess(true);
+      setForm({
+        empresa: "",
+        nombre: "",
+        correo: "",
+        ruta: "",
+      });
 
-      console.log("✅ Empresa, usuario y carpeta raíz creados correctamente")
     } catch (err) {
-      console.error("❌ Error al crear empresa:", err)
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-  }
-
-
-  
-
+  };
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f5f7fa" }}>
-    
-      {/* CONTENIDO PRINCIPAL */}
       <Box sx={{ flexGrow: 1 }}>
-        
-
         <Box sx={{ p: 4 }}>
           <Paper sx={{ maxWidth: 600, mx: "auto", p: 4 }}>
             <Typography variant="h5" fontWeight="bold" mb={3}>
               Crear Empresa
             </Typography>
+
+            {success && (
+              <Alert severity="success" sx={{ mb: 2 }}>
+                Empresa y usuario creados correctamente.  
+                El usuario podrá establecer su contraseña desde su correo.
+              </Alert>
+            )}
+
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
 
             <form onSubmit={handleSubmit}>
               <Stack spacing={3}>
@@ -118,31 +136,22 @@ export default function CrearEmpresa() {
                 />
 
                 <TextField
-                  label="Contraseña"
-                  name="password"
-                  type="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  fullWidth
-                  required
-                />
-
-                <TextField
-                  label="Ruta raíz de la empresa"
+                  label="Nombre de la carpeta raíz"
                   name="ruta"
                   value={form.ruta}
                   onChange={handleChange}
                   fullWidth
                   required
-                  helperText="Ejemplo: /empresa1raiz"
+                  helperText="Ejemplo: Empresa ABC"
                 />
 
                 <Button
                   type="submit"
                   variant="contained"
                   size="large"
+                  disabled={loading}
                 >
-                  Crear Empresa
+                  {loading ? "Creando..." : "Crear Empresa"}
                 </Button>
               </Stack>
             </form>

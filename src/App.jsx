@@ -12,6 +12,9 @@ import AdminLayout from "./layout/AdminLayout";
 import DriveView from "./layout/AdminLayout";
 import UserLayout from "./layout/UserLayout";
 import CarpetaView from "./pages/CarpetaView";
+import ResetPassword from "./pages/Admin/reset-pasword";
+import Perfil from "./components/Perfil";
+
 // Componente auxiliar para proteger rutas
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { isAuthenticated, loading, profile } = useAuth()
@@ -44,16 +47,16 @@ function App() {
                     <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminLayout /></ProtectedRoute>}>
                         <Route index element={<DashboardAdmin />} />
                         <Route path="crear-empresa" element={<CrearEmpresa />} />
-                        <Route path="empresa/:slug/*" element={<DriveView />} />
+                        <Route path="empresa/:slug/*" element={<DriveView />} />    
                     </Route>
-
+                    <Route path="/reset-password" element={< ResetPassword/>} />
                     {/* USER (Rutas protegidas) */}
                     {/* 3. Usar ProtectedRoute para envolver el UserLayout */}
                     <Route path="/user" element={<ProtectedRoute allowedRoles={['user']}><UserLayout /></ProtectedRoute>}>
                         <Route index element={<DashboardUsuario />} />
                         <Route path="empresa/:slug/*" element={<DriveView />} />
                     </Route>
-
+                    <Route path="/perfil" element={<Perfil />}/>
                     {/* FALLBACK */}
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

@@ -108,24 +108,31 @@ export default function CarpetaView() {
             return;
         }
 
-        let path = [];
-        let currentId = id;
+        try {
+            const session = await supabase.auth.getSession();
+            const token = session.data.session?.access_token;
 
-        while (currentId) {
-            const { data, error } = await supabase
-            .from("carpeta")
-            .select("id_carpeta, nombre, padre")
-            .eq("id_carpeta", currentId)
-            .single();
+            const res = await fetch(
+            `http://localhost:4000/empresa/ruta/${id}`,
+            {
+                headers: {
+                Authorization: `Bearer ${token}`,
+                },
+            }
+            );
 
-            if (error || !data) break;
+            const data = await res.json();
 
-            path.unshift(data);
-            currentId = data.padre_id;
+            if (res.ok) {
+            // Ordenamos desde raíz → actual
+            const ordenada = data.reverse();
+            setRuta(ordenada);
+            }
+        } catch (error) {
+            console.error("Error ruta:", error);
         }
-
-        setRuta(path);
     };
+
 
 
 
@@ -279,16 +286,37 @@ export default function CarpetaView() {
 
 
     // --- ELIMINAR ARCHIVO ---
-    const handleDeleteArchivo = async (archivoId) => {
-        const { error } = await supabase
+    const handleDeleteArchivo = async (archivo) => {
+        const confirm = window.confirm(`¿Eliminar el archivo "${archivo.nombre}"?`);
+        if (!confirm) return;
+
+        // 1️⃣ Eliminar del storage
+        const { error: storageError } = await supabase.storage
+            .from("files")
+            .remove([archivo.storage_path]);
+
+        if (storageError) {
+            console.error("Error al borrar del storage:", storageError);
+            return;
+        }
+
+        // 2️⃣ Eliminar de la tabla
+        const { error: dbError } = await supabase
             .from("archivo")
             .delete()
-            .eq("id", archivoId);
+            .eq("id_archivo", archivo.id_archivo);
 
-        if (!error) {
-            setArchivos(prev => prev.filter(a => a.id !== archivoId));
+        if (dbError) {
+            console.error("Error al borrar de la BD:", dbError);
+            return;
         }
+
+        // 3️⃣ Actualizar estado
+        setArchivos(prev =>
+            prev.filter(a => a.id_archivo !== archivo.id_archivo)
+        );
     };
+
 
 
     // --- RENOMBRAR CARPETA ---
@@ -384,7 +412,7 @@ return (
                         
                         return isLast ? (
                             <Typography
-                                key={paso.id}
+                                key={paso.id_carpeta}
                                 sx={{ display: 'flex', alignItems: 'center', color: 'text.primary', fontWeight: 'bold' }}
                             >
                                 {paso.nombre}
@@ -547,6 +575,12 @@ return (
                                     </Box>
                                     <IconButton size="small" onClick={() => downloadFile(archivo.storage_path, archivo.nombre)}>
                                         <InsertDriveFileIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        size="small"
+                                        onClick={() => handleDeleteArchivo(archivo)}
+                                    >
+                                        <DeleteIcon />
                                     </IconButton>
                                 </Box>
                             </Grid>

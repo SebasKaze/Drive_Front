@@ -32,19 +32,15 @@ export default function DashboardAdmin() {
   const [carpetasRaiz, setCarpetasRaiz] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [nombreCarpeta, setNombreCarpeta] = useState("");
-  const [openModal, setOpenModal] = useState(false);
-
-
-
-
-
-
-
-
 
   const fetchCarpetasRaiz = async () => {
     setLoading(true);
+
+
+
+    const { data: { session } } = await supabase.auth.getSession();
+    console.log("Token de sesion:",session.access_token);
+
 
     const { data, error } = await supabase
       .from("carpeta")
@@ -67,44 +63,18 @@ export default function DashboardAdmin() {
     fetchCarpetasRaiz();
   }, []);
 
-  // ====== 3. ACTUALIZAR HANDLER ======
   const handleOpenCarpeta = (carpetaId) => {
     navigate(`/dashboard/carpeta/${carpetaId}`);
   };
 
-
-
-  //Boton para crear carpeta
-  const handleCreateCarpeta = async () => {
-    if (!nombreCarpeta.trim()) return;
-
-    const { data, error } = await supabase
-      .from("carpetas")
-      .insert({
-        nombre: nombreCarpeta,
-        padre_id: null, // raíz
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Error creando carpeta:", error);
-      return;
-    }
-
-    setCarpetasRaiz(prev => [...prev, data]);
-    setNombreCarpeta("");
-  };
-
   return (
-    <Box sx={{ animation: "fadeIn 0.5s ease-in" }}>carpeta.id
+    <Box sx={{ animation: "fadeIn 0.5s ease-in" }}>
       <Typography
         component="div"
         variant="h5"
         sx={{ mb: 3, fontWeight: "bold", color: theme.palette.text.primary }}>
         Panel de Administrador
       </Typography>
-
       <Paper
         elevation={0}
         sx={{
@@ -119,23 +89,14 @@ export default function DashboardAdmin() {
           alignItems="center"
           sx={{ mb: 2 }}
         >
-        <Typography
-          variant="subtitle1"
-          component="div"
-          sx={{ display: "flex", alignItems: "center", gap: 1 }}
-        >
-          <PersonIcon color="primary" />
-          Carpetas raíz
-        </Typography>
-
-          <Button
-            variant="contained"
-            size="small"
-            startIcon={<CreateNewFolderIcon />}
-            onClick={() => setOpenModal(true)}
+          <Typography
+            variant="subtitle1"
+            component="div"
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
-            Nueva carpeta
-          </Button>
+            <PersonIcon color="primary" />
+            Carpetas raíz
+          </Typography>
         </Stack>
 
         <Box sx={{ maxHeight: "260px", overflowY: "auto", pr: 1 }}>
@@ -151,7 +112,7 @@ export default function DashboardAdmin() {
             )}
 
             {carpetasRaiz.map((carpeta) => (
-              <Grid item xs={6} sm={4} md={3} lg={2} key={carpeta.id_carpeta}> {/* Cambié carpeta.id por carpeta.id_carpeta según tu select */}
+              <Grid item xs={6} sm={4} md={3} lg={2} key={carpeta.id_carpeta}> 
                 <Box
                   onClick={() => handleOpenCarpeta(carpeta.id_carpeta)}
                   sx={{
@@ -171,8 +132,6 @@ export default function DashboardAdmin() {
                   }}
                 >
                   <FolderIcon sx={{ fontSize: 40, color: "#FFCA28", mb: 1 }} />
-                  
-                  {/* Cambiamos a component="div" para que pueda contener estructuras complejas sin quejarse */}
                   <Typography variant="body2" fontWeight="600" noWrap component="div">
                     {carpeta.nombre}
                   </Typography>
@@ -186,35 +145,6 @@ export default function DashboardAdmin() {
           </Grid>
         </Box>
       </Paper>
-
-      {/*===MODAL NUEVA CARPETA===*/}
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>Nueva carpeta</DialogTitle>
-
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Nombre de la carpeta"
-            fullWidth
-            value={nombreCarpeta}
-            onChange={(e) => setNombreCarpeta(e.target.value)}
-          />
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={() => setOpenModal(false)}>Cancelar</Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              handleCreateCarpeta();
-              setOpenModal(false);
-            }}
-          >
-            Crear
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 }
