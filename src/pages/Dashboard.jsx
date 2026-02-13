@@ -17,7 +17,7 @@ export default function Dashboard() {
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/dashboard-info");
+        const res = await fetch("https://drivebacksup.onrender.com/api/dashboard-info");
         const data = await res.json();
 
         setUserRole(data.role);

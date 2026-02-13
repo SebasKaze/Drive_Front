@@ -113,7 +113,7 @@ export default function CarpetaView() {
             const token = session.data.session?.access_token;
 
             const res = await fetch(
-            `http://localhost:4000/empresa/ruta/${id}`,
+            `https://drivebacksup.onrender.com/empresa/ruta/${id}`,
             {
                 headers: {
                 Authorization: `Bearer ${token}`,
@@ -322,7 +322,7 @@ export default function CarpetaView() {
     // --- RENOMBRAR CARPETA ---
     const handleRenameCarpeta = async () => {
         try {
-            const res = await fetch(`http://localhost:4000/api/cambiarcarpeta/${itemSeleccionado.datos.id_carpeta}`, {
+            const res = await fetch(`https://drivebacksup.onrender.com/api/cambiarcarpeta/${itemSeleccionado.datos.id_carpeta}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ nombre: nuevoNombre }),

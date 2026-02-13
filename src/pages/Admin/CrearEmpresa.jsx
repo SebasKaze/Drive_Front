@@ -44,7 +44,7 @@ export default function CrearEmpresa() {
       if (!session) throw new Error("Usuario no autenticado");
 
       const res = await fetch(
-        "http://localhost:4000/empresa/crear",
+        "https://drivebacksup.onrender.com/empresa/crear",
         {
           method: "POST",
           headers: {
