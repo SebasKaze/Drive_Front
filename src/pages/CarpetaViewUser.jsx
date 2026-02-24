@@ -38,8 +38,7 @@ import { supabase } from "../supabase";
 
 
 // Vistas
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
+
 import RutaBreadcrumbs from "../components/RutaBreadcrumbs";
 import { useRuta } from "../hooks/useRuta";
 
@@ -76,23 +75,28 @@ export default function CarpetaView() {
     const [nuevoNombre, setNuevoNombre] = useState("");
 
 
+    const [userId, setUserId] = useState(null);
+
+
 
     const fetchSubcarpetas = async () => {
+        if (!userId) return;
+
         setLoading(true);
 
-        if (!id) {
-            setSubcarpetas([]);
-            setLoading(false);
-            return;
-        }
-        const carpetaId = id ? Number(id) : null;
-        if (isNaN(carpetaId)) return;
-        
-        const { data, error } = await supabase
+        let query = supabase
             .from("carpeta")
             .select("id_carpeta, nombre, fecha_creacion")
-            .eq("padre", id)
+            .eq("id_usuario_fk", userId)
             .order("nombre");
+
+        if (id) {
+            query = query.eq("padre", id);
+        } else {
+            query = query.is("padre", null); // carpeta raíz
+        }
+
+        const { data, error } = await query;
 
         if (error) {
             console.error("Error subcarpetas:", error);
@@ -103,7 +107,6 @@ export default function CarpetaView() {
 
         setLoading(false);
     };
-
     const fetchRuta = async () => {
         if (!id) {
             setRuta([]);
@@ -136,10 +139,6 @@ export default function CarpetaView() {
     };
 
 
-
-
-
-
     const handleOpenCarpeta = (id) => {
         navigate(`/dashboard/carpeta/${id}`);
     };
@@ -155,6 +154,7 @@ export default function CarpetaView() {
             .insert({
             nombre: nombreCarpeta,
             padre: id,
+            id_usuario_fk: userId   // 🔥 IMPORTANTE
             })
             .select()
             .single();
@@ -216,26 +216,28 @@ export default function CarpetaView() {
 
 
     const fetchArchivos = async () => {
-        if (!id) {
-            setArchivos([]);
-            return;
-        }
-
-        const carpetaId = Number(id);
-        if (isNaN(carpetaId)) return;
+        if (!id || !userId) return;
 
         const { data, error } = await supabase
             .from("archivo")
-            .select("id_archivo, nombre, tamano, fecha, storage_path")
+            .select(`
+                id_archivo,
+                nombre,
+                tamano,
+                fecha,
+                storage_path,
+                carpeta!inner(id_usuario_fk)
+            `)
             .eq("id_carpeta_fk", id)
+            .eq("carpeta.id_usuario_fk", userId)
             .order("fecha", { ascending: false });
+
         if (error) {
             console.error(error);
             setArchivos([]);
         } else {
             setArchivos(data || []);
         }
-
     };
 
     const downloadFile = async (storagePath, nombre) => {
@@ -373,22 +375,32 @@ export default function CarpetaView() {
 
     //USES EFFECT
     useEffect(() => {
-    fetchSubcarpetas();
-    fetchArchivos();
+        const getUser = async () => {
+            const { data } = await supabase.auth.getUser();
+            if (data?.user) {
+                setUserId(data.user.id);
+            }
+        };
+        getUser();
+    }, []);
 
-    if (id) {
-        fetchRuta();
-    } else {
-        setRuta([]);
-    }
-    }, [id]);
+    useEffect(() => {
+        if (!userId) return;
+
+        fetchSubcarpetas();
+        fetchArchivos();
+
+        if (id) {
+            fetchRuta();
+        } else {
+            setRuta([]);
+        }
+    }, [id, userId]);
 
 
 return (
     <Box>
-        <Navbar />
         <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f5f7fa" }}>
-            <Sidebar/>
             <Box 
                 sx={{
                 flexGrow: 1,
@@ -399,7 +411,7 @@ return (
                 <Typography
                     variant="h5"
                     sx={{ mb: 2, fontWeight: "bold", color: theme.palette.text.primary }}>
-                    Explorador de carpetas
+                    Bienvenido a tu carpeta
                 </Typography>
                 
                 {/* ===== RUTA DE NAVEGACIÓN (BREADCRUMBS) ===== */}

@@ -36,11 +36,10 @@ export default function DashboardAdmin() {
   const fetchCarpetasRaiz = async () => {
     setLoading(true);
 
-
-
+    {/* 
     const { data: { session } } = await supabase.auth.getSession();
     console.log("Token de sesion:",session.access_token);
-
+    */}
 
     const { data, error } = await supabase
       .from("carpeta")

@@ -7,13 +7,12 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import DashboardAdmin from "./pages/DashboardAdmin";
 import DashboardUsuario from "./pages/DashboardUsuario";
-import CrearEmpresa from "./pages/Admin/CrearEmpresa";
 import AdminLayout from "./layout/AdminLayout";
 import DriveView from "./layout/AdminLayout";
 import UserLayout from "./layout/UserLayout";
 import CarpetaView from "./pages/CarpetaView";
-import ResetPassword from "./pages/Admin/reset-pasword";
 import Perfil from "./components/Perfil";
+import CarpetaViewUser from "./pages/CarpetaViewUser";
 
 // Componente auxiliar para proteger rutas
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -32,6 +31,26 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
     return children
 }
+const RootRedirect = () => {
+    const { isAuthenticated, loading, profile } = useAuth()
+
+    if (loading) return <p>Cargando...</p>
+
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />
+    }
+
+    // Si está autenticado, redirige según rol
+    if (profile?.tipo === "admin") {
+        return <Navigate to="/admin" replace />
+    }
+
+    if (profile?.tipo === "user") {
+        return <Navigate to="/user" replace />
+    }
+
+    return <Navigate to="/login" replace />
+}
 
 
 function App() {
@@ -39,21 +58,21 @@ function App() {
             <Router>
                 <Routes>
                     {/* PUBLIC */}
-                    <Route path="/" element={<Home />} />
+                    <Route path="/" element={<RootRedirect />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/dashboard/carpeta/:id" element={<CarpetaView />} />
+                    <Route path="/home" element={<Home/>}/>
                     {/* ADMIN (Rutas protegidas) */}
-                    {/* 2. Usar ProtectedRoute para envolver el AdminLayout */}
+                    
                     <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminLayout /></ProtectedRoute>}>
                         <Route index element={<DashboardAdmin />} />
-                        <Route path="crear-empresa" element={<CrearEmpresa />} />
                         <Route path="empresa/:slug/*" element={<DriveView />} />    
                     </Route>
-                    <Route path="/reset-password" element={< ResetPassword/>} />
+                    
                     {/* USER (Rutas protegidas) */}
-                    {/* 3. Usar ProtectedRoute para envolver el UserLayout */}
+                    
                     <Route path="/user" element={<ProtectedRoute allowedRoles={['user']}><UserLayout /></ProtectedRoute>}>
-                        <Route index element={<DashboardUsuario />} />
+                        <Route index element={<CarpetaViewUser />} />
                         <Route path="empresa/:slug/*" element={<DriveView />} />
                     </Route>
                     <Route path="/perfil" element={<Perfil />}/>

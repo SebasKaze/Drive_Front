@@ -92,7 +92,7 @@ const Navbar = () => {
             <Box sx={{ display: "flex", ml: 5, gap: 4 }}>
               <Typography
                 component={RouterLink}
-                to="/"
+                to="/home"
                 sx={{
                   textDecoration: "none",
                   color: "gray",

@@ -75,8 +75,9 @@ const Sidebar = () => {
         <Typography variant="caption" color="text.secondary" component="div">
           {isAdmin ? "Administrador" : "Usuario"}
         </Typography>
-
+        {/* 
         {isAdmin && (
+          
           <Button
             fullWidth
             startIcon={<BusinessIcon />}
@@ -87,22 +88,18 @@ const Sidebar = () => {
             Crear empresa
           </Button>
         )}
+        */}
       </Box>
 
       <Divider />
 
       {/* ===== NAV ===== */}
       <List>
-        <ListItemButton onClick={() => navigate("/")}>
+        <ListItemButton onClick={() => navigate("/home")}>
           <ListItemIcon><HomeIcon /></ListItemIcon>
           <ListItemText primary="Inicio" />
         </ListItemButton>
-
-        <ListItemButton onClick={() => navigate("/")}>
-          <ListItemIcon><AccessTimeIcon /></ListItemIcon>
-          <ListItemText primary="Recientes" />
-        </ListItemButton>
-
+        
         <ListItemButton onClick={() => navigate("/")}>
           <ListItemIcon><DeleteIcon /></ListItemIcon>
           <ListItemText primary="Papelera" />

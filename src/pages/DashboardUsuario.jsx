@@ -1,97 +1,148 @@
-// pages/DashboardUsuario.jsx
-import { 
-  Box, Grid, Paper, Typography, Table, TableBody, TableCell, 
-  TableContainer, TableHead, TableRow, useTheme, alpha 
+// pages/DashboardAdmin.jsx
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // 1. Importar useNavigate
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  useTheme,
+  alpha,
+  Button,
+  Stack,
 } from "@mui/material";
 
 import FolderIcon from "@mui/icons-material/Folder";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import PersonIcon from "@mui/icons-material/Person";
 
-// --- MOCK DATA (Mover del archivo principal) ---
-// Define el ID del usuario actual. En producción, esto se pasa como prop.
-const currentUserId = 1; 
-const mockUserFolders = [ /* ... copia los datos de mockUserFolders ... */
-  { id: 101, name: "Mis Facturas", date: "2024-01-20" },
-  // ... más carpetas ...
-];
-const mockAllFiles = [ /* ... copia los datos de mockAllFiles ... */
-  { id: 1, name: "Reporte_Mensual.pdf", type: "pdf", size: "2.4 MB", date: "2024-01-20", owner: "Juan Pérez", ownerId: 1 },
-  // ... más archivos (asegúrate de incluir los del currentUserId) ...
-];
-// --------------------------------------------------
+import { supabase } from "../supabase";
 
-export default function DashboardUsuario() {
+
+export default function DashboardAdmin() {
+  //INICIALIZACIONES
   const theme = useTheme();
-  // Lógica de filtrado
-  const myFiles = mockAllFiles.filter(f => f.ownerId === currentUserId);
+  const navigate = useNavigate(); // 2. Inicializar navigate
+  const [carpetaUsuario, setCarpetaUsuario] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+
+
+
+  useEffect(() => {
+    const fetchCarpetaUsuario = async () => {
+      setLoading(true);
+
+      // 1️⃣ Obtener usuario logueado
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        console.error("No hay usuario autenticado");
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("carpeta")
+        .select("id_carpeta, nombre, fecha_creacion")
+        .eq("id_usuario_fk", user.id)
+        .is("padre", null)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error cargando carpeta del usuario:", error);
+        setLoading(false);
+        return;
+      }
+
+      if (data) {
+        setCarpetaUsuario(data);
+      }
+
+      setLoading(false);
+    };
+
+    fetchCarpetaUsuario();
+  }, [navigate]);
+
+  const handleOpenCarpeta = (carpetaId) => {
+    navigate(`/dashboard/carpeta/${carpetaId}`);
+  };
 
   return (
-    <Box sx={{ animation: 'fadeIn 0.5s ease-in' }}>
-       <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold', color: theme.palette.text.primary }}>
-        Mi Unidad
-      </Typography>
+    <Box sx={{ animation: "fadeIn 0.5s ease-in" }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          mb: 4,
+          borderRadius: 3,
+          border: `1px solid ${theme.palette.divider}`,
+        }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 2 }}
+        >
+          <Typography
+            variant="subtitle1"
+            component="div"
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            <PersonIcon color="primary" />
+            Carpeta raíz
+          </Typography>
+        </Stack>
 
-      {/* SECCIÓN 1: Mis Carpetas Recientes */}
-      <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 3, border: `1px solid ${theme.palette.divider}` }}>
-        {/* ... Copia aquí todo el código JSX de la SECCIÓN 1 (Grid de Carpetas) de UserView ... */}
-        <Typography variant="subtitle1" sx={{ mb: 2 }}>Mis Carpetas</Typography>
-        <Grid container spacing={2}>
-          {mockUserFolders.map((folder) => (
-            <Grid item xs={12} sm={6} md={3} key={folder.id}>
-               <Box sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.04), borderRadius: 2, display: 'flex', alignItems: 'center', gap: 2, cursor: 'pointer', '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.1) } }}>
-                <FolderIcon color="primary" />
-                <Box>
-                  <Typography variant="body2" fontWeight="bold">{folder.name}</Typography>
-                  <Typography variant="caption" color="text.secondary">{folder.date}</Typography>
+        <Box sx={{ maxHeight: "260px", overflowY: "auto", pr: 1 }}>
+          {loading && (
+            <Typography variant="body2">Cargando...</Typography>
+          )}
+
+          {!loading && !carpetaUsuario && (
+            <Typography variant="body2" color="text.secondary">
+              No tienes carpeta asignada
+            </Typography>
+          )}
+
+          {!loading && carpetaUsuario && (
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={4} lg={3}>
+                <Box
+                  onClick={() => handleOpenCarpeta(carpetaUsuario.id_carpeta)}
+                  sx={{
+                    p: 2,
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: 2,
+                    textAlign: "center",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    "&:hover": {
+                      bgcolor: alpha(theme.palette.primary.main, 0.05),
+                      borderColor: theme.palette.primary.main,
+                    },
+                  }}
+                >
+                  <FolderIcon sx={{ fontSize: 40, color: "#FFCA28", mb: 1 }} />
+
+                  <Typography variant="body2" fontWeight="600" noWrap>
+                    {carpetaUsuario.nombre}
+                  </Typography>
+
+                  <Typography variant="caption" color="text.secondary">
+                    {carpetaUsuario.fecha_creacion
+                      ? new Date(carpetaUsuario.fecha_creacion).toLocaleDateString()
+                      : "Sin fecha"}
+                  </Typography>
                 </Box>
-              </Box>
+              </Grid>
             </Grid>
-          ))}
-        </Grid>
-      </Paper>
+          )}
+        </Box>
 
-      {/* SECCIÓN 2: Mis Archivos Recientes */}
-      <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: `1px solid ${theme.palette.divider}` }}>
-        {/* ... Copia aquí todo el código JSX de la SECCIÓN 2 (Tabla Personal) de UserView ... */}
-        <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>Mis archivos recientes</Typography>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nombre / Formato</TableCell>
-                <TableCell>Tamaño</TableCell>
-                <TableCell>Fecha</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {myFiles.length > 0 ? (
-                myFiles.map((file) => (
-                  <TableRow key={file.id} hover>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <InsertDriveFileIcon color="action" fontSize="small" />
-                        <Typography variant="body2" fontWeight="500">{file.name}</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell sx={{ color: 'text.secondary' }}>{file.size}</TableCell>
-                    <TableCell>
-                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary', fontSize: '0.875rem' }}>
-                         <AccessTimeIcon fontSize="inherit"/> {file.date}
-                       </Box>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={3} align="center" sx={{ py: 3 }}>
-                    <Typography color="text.secondary">No has subido archivos aún.</Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
       </Paper>
     </Box>
   );
