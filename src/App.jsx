@@ -14,6 +14,8 @@ import CarpetaView from "./pages/CarpetaView";
 import Perfil from "./components/Perfil";
 import CarpetaViewUser from "./pages/CarpetaViewUser";
 
+
+
 // Componente auxiliar para proteger rutas
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { isAuthenticated, loading, profile } = useAuth()
@@ -55,32 +57,36 @@ const RootRedirect = () => {
 
 function App() {
     return (    
-            <Router>
-                <Routes>
-                    {/* PUBLIC */}
-                    <Route path="/" element={<RootRedirect />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/dashboard/carpeta/:id" element={<CarpetaView />} />
-                    <Route path="/dashboard/carpetas/:id" element={<CarpetaViewUser />} />
-                    <Route path="/home" element={<Home/>}/>
-                    {/* ADMIN (Rutas protegidas) */}
-                    
-                    <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminLayout /></ProtectedRoute>}>
-                        <Route index element={<DashboardAdmin />} />
-                        <Route path="empresa/:slug/*" element={<DriveView />} />    
-                    </Route>
-                    
-                    {/* USER (Rutas protegidas) */}
-                    
-                    <Route path="/user" element={<ProtectedRoute allowedRoles={['user']}><UserLayout /></ProtectedRoute>}>
-                        <Route index element={<CarpetaViewUser />} />
-                        <Route path="empresa/:slug/*" element={<DriveView />} />
-                    </Route>
-                    <Route path="/perfil" element={<Perfil />}/>
-                    {/* FALLBACK */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-            </Router>
+            <AuthProvider>
+                <Router>
+                    <Routes>
+                        {/* PUBLIC */}
+                        <Route path="/" element={<RootRedirect />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/dashboard/carpeta/:id" element={<CarpetaView />} />
+                        <Route path="/dashboard/carpetas/:id" element={<CarpetaViewUser />} />
+                        <Route path="/home" element={<Home/>}/>
+                        {/* ADMIN (Rutas protegidas) */}
+                        
+                        <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminLayout /></ProtectedRoute>}>
+                            <Route index element={<DashboardAdmin />} />
+                            <Route path="empresa/:slug/*" element={<DriveView />} />    
+                        </Route>
+                        
+                        {/* USER (Rutas protegidas) */}
+                        
+                        <Route path="/user" element={<ProtectedRoute allowedRoles={['user']}><UserLayout /></ProtectedRoute>}>
+                            <Route index element={<DashboardUsuario />} />
+                            <Route path="empresa/:slug/*" element={<DriveView />} />
+                            
+                        </Route>
+                        <Route path="/perfil" element={<Perfil />}/>
+                        {/* FALLBACK */}
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </Router>
+            </AuthProvider>
+
     );
 }
 

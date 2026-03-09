@@ -12,6 +12,13 @@ import {
   Divider,
   useMediaQuery
 } from "@mui/material";
+
+import CloudIcon from "@mui/icons-material/Cloud";
+
+
+
+
+
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -48,11 +55,11 @@ const Navbar = () => {
   return (
     <AppBar
       position="static"
-      elevation={1}
+      elevation={2}
       sx={{
-        backgroundColor: "white",
-        borderBottom: "1px solid #e5e7eb",
-        color: "black",
+        backgroundColor: "#101935",
+        borderBottom: "1px solid #1B2A4A",
+        color: "#F1F5F9",
       }}
     >
       <Toolbar sx={{ maxWidth: "1400px", mx: "auto", width: "100%" }}>
@@ -62,24 +69,23 @@ const Navbar = () => {
             component={RouterLink}
             to="/"
             sx={{
-              backgroundColor: "#2563eb",
+              backgroundColor: "#1B2A4A",
               width: 40,
               height: 40,
               borderRadius: 2,
-              "&:hover": { backgroundColor: "#1e40af" }
+              "&:hover": { backgroundColor: "#23395B" }
             }}
           >
-            <Typography component="div" sx={{ color: "white", fontWeight: "bold" }}>
-              D
-            </Typography>
+            <CloudIcon sx={{ color: "#F1F5F9" }} />
           </IconButton>
+
           <Typography
             variant="h6"
             component={RouterLink}
             to="/"
             sx={{
               textDecoration: "none",
-              color: "black",
+              color: "#F1F5F9",
               fontWeight: "bold",
               ml: 2,
               fontSize: "1.4rem"
@@ -87,7 +93,8 @@ const Navbar = () => {
           >
             CMB Drive
           </Typography>
-          {/* Links */}
+
+          {/* Links Desktop */}
           {isDesktop && (
             <Box sx={{ display: "flex", ml: 5, gap: 4 }}>
               <Typography
@@ -95,21 +102,22 @@ const Navbar = () => {
                 to="/home"
                 sx={{
                   textDecoration: "none",
-                  color: "gray",
+                  color: "#CBD5E1",
                   fontSize: "1rem",
-                  "&:hover": { color: "#2563eb" }
+                  "&:hover": { color: "#ffffff" }
                 }}
               >
                 Inicio
               </Typography>
+
               <Typography
                 component={RouterLink}
                 to={drivePath}
                 sx={{
                   textDecoration: "none",
-                  color: "gray",
+                  color: "#CBD5E1",
                   fontSize: "1rem",
-                  "&:hover": { color: "#2563eb" }
+                  "&:hover": { color: "#ffffff" }
                 }}
               >
                 Mi Drive
@@ -117,21 +125,31 @@ const Navbar = () => {
             </Box>
           )}
         </Box>
-        {/* ===== OPCIONES ===== */}
-        {/* ===== BOTÓN PERFIL ===== */}
+
+        {/* PERFIL */}
         <Button
           onClick={handleOpenMenu}
           sx={{
             textTransform: "none",
             fontWeight: 500,
-            color: "black",
+            color: "#F1F5F9",
             display: "flex",
             alignItems: "center",
-            gap: 1.5
+            gap: 1.5,
+            paddingRight: 7
           }}
         >
-          <Avatar sx={{ width: 32, height: 32 }}>
-            {profile?.nombre?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
+          <Avatar
+            sx={{
+              width: 32,
+              height: 32,
+              backgroundColor: "#23395B",
+              color: "#F1F5F9"
+            }}
+          >
+            {profile?.nombre?.[0]?.toUpperCase() ||
+              user?.email?.[0]?.toUpperCase() ||
+              "U"}
           </Avatar>
 
           {isDesktop && (
@@ -139,13 +157,14 @@ const Navbar = () => {
               <Typography variant="body2" fontWeight="bold">
                 {profile?.nombre || "Usuario"}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: "#CBD5E1" }}>
                 {profile?.tipo}
               </Typography>
             </Box>
           )}
         </Button>
 
+        {/* MENÚ DESPLEGABLE */}
         <Menu
           anchorEl={anchorEl}
           open={open}
@@ -157,41 +176,50 @@ const Navbar = () => {
               mt: 1,
               borderRadius: 2,
               minWidth: 220,
-              p: 1
+              p: 1,
+              backgroundColor: "#162447",
+              color: "#F1F5F9"
             }
           }}
         >
-          {/* Header usuario */}
           <Box sx={{ px: 2, py: 1 }}>
             <Typography fontWeight="bold">
               {profile?.nombre}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: "#CBD5E1" }}>
               {user?.email}
             </Typography>
           </Box>
 
-          <Divider sx={{ my: 1 }} />
+          <Divider sx={{ my: 1, borderColor: "#1B2A4A" }} />
 
           <MenuItem
             onClick={() => {
               navigate("/perfil");
               handleCloseMenu();
             }}
+            sx={{
+              borderRadius: 1,
+              "&:hover": { backgroundColor: "#23395B" }
+            }}
           >
             Mi Perfil
           </MenuItem>
 
-          <Divider sx={{ my: 1 }} />
+          <Divider sx={{ my: 1, borderColor: "#1B2A4A" }} />
 
           <MenuItem
             onClick={handleLogout}
-            sx={{ color: "error.main", fontWeight: 500 }}
+            sx={{
+              color: "#F87171",
+              fontWeight: 500,
+              borderRadius: 1,
+              "&:hover": { backgroundColor: "#23395B" }
+            }}
           >
             Cerrar sesión
           </MenuItem>
         </Menu>
-
       </Toolbar>
     </AppBar>
   );

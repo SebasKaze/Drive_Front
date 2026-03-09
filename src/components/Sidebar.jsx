@@ -60,82 +60,118 @@ const Sidebar = () => {
       sx={{
         width: 260,
         height: "100vh",
-        borderRight: "1px solid #e5e7eb",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "background.paper"
+        bgcolor: "#ffca3a",
+        color: "#1e1e1e",
+        borderRight: "2px solid #fcbf49",
+        transition: "all 0.3s ease"
       }}
     >
       {/* ===== HEADER ===== */}
-      <Box sx={{ p: 2 }}>
-        <Typography variant="h6" fontWeight="bold" component="div">
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h6" fontWeight="bold">
           CMB Drive
         </Typography>
 
-        <Typography variant="caption" color="text.secondary" component="div">
+        <Typography variant="caption" sx={{ opacity: 0.8 }}>
           {isAdmin ? "Administrador" : "Usuario"}
         </Typography>
-        {/* 
-        {isAdmin && (
-          
-          <Button
-            fullWidth
-            startIcon={<BusinessIcon />}
-            variant="contained"
-            sx={{ mt: 2 }}
-            onClick={() => navigate("/admin/crear-empresa")}
-          >
-            Crear empresa
-          </Button>
-        )}
-        */}
       </Box>
 
-      <Divider />
+      <Divider sx={{ borderColor: "rgba(0,0,0,0.2)" }} />
 
-      {/* ===== NAV ===== */}
-      <List>
-        <ListItemButton onClick={() => navigate("/home")}>
-          <ListItemIcon><HomeIcon /></ListItemIcon>
-          <ListItemText primary="Inicio" />
-        </ListItemButton>
-        
-        <ListItemButton onClick={() => navigate("/")}>
-          <ListItemIcon><DeleteIcon /></ListItemIcon>
-          <ListItemText primary="Papelera" />
-        </ListItemButton>
+      {/* ===== NAV PRINCIPAL ===== */}
+      <List sx={{ px: 1, mt: 1 }}>
+        {[
+          { text: "Inicio", icon: <HomeIcon />, path: "/home" },
+          { text: "Papelera", icon: <DeleteIcon />, path: "/" }
+        ].map((item) => (
+          <ListItemButton
+            key={item.text}
+            onClick={() => navigate(item.path)}
+            sx={{
+              borderRadius: 2,
+              mb: 1,
+              transition: "all 0.25s ease",
+              "&:hover": {
+                bgcolor: "#fcbf49",
+                transform: "translateX(6px)",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+              }
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                color: "#1e1e1e",
+                minWidth: 36,
+                transition: "0.3s"
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText
+              primary={item.text}
+              primaryTypographyProps={{
+                fontWeight: 500
+              }}
+            />
+          </ListItemButton>
+        ))}
       </List>
 
-      <Divider />
+      <Divider sx={{ borderColor: "rgba(0,0,0,0.2)", my: 1 }} />
 
-      {/* ===== CARPETAS RAÍZ (ADMIN) ===== */}
+      {/* ===== CARPETAS ADMIN ===== */}
       {isAdmin && (
         <Box sx={{ flexGrow: 1, overflow: "auto" }}>
-          <Box sx={{ px: 2, py: 1 }}>
-            <Typography component="div" variant="subtitle2" fontWeight="bold">
+          <Box sx={{ px: 3, py: 1 }}>
+            <Typography variant="subtitle2" fontWeight="bold">
               CARPETAS
             </Typography>
           </Box>
 
           {loading ? (
             <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
-              <CircularProgress size={22} />
+              <CircularProgress size={22} sx={{ color: "#1e1e1e" }} />
             </Box>
           ) : folders.length === 0 ? (
-            <Typography component="div" variant="body2" color="text.secondary" sx={{ px: 2 }}>
+            <Typography variant="body2" sx={{ px: 3, opacity: 0.7 }}>
               No hay carpetas raíz
             </Typography>
           ) : (
-            <List>
-              {folders.map(folder => (
+            <List sx={{ px: 1 }}>
+              {folders.map((folder) => (
                 <ListItemButton
                   key={folder.id_carpeta}
                   onClick={() =>
                     navigate(`/dashboard/carpeta/${folder.id_carpeta}`)
                   }
+                  sx={{
+                    borderRadius: 2,
+                    mb: 1,
+                    transition: "all 0.25s ease",
+                    "&:hover": {
+                      bgcolor: "#fcbf49",
+                      transform: "translateX(6px)",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+                    }
+                  }}
                 >
-                  <ListItemIcon><FolderIcon /></ListItemIcon>
-                  <ListItemText primary={folder.nombre} />
+                  <ListItemIcon
+                    sx={{
+                      color: "#1e1e1e",
+                      minWidth: 36
+                    }}
+                  >
+                    <FolderIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={folder.nombre}
+                    primaryTypographyProps={{
+                      fontWeight: 500
+                    }}
+                  />
                 </ListItemButton>
               ))}
             </List>
@@ -144,6 +180,9 @@ const Sidebar = () => {
       )}
     </Box>
   )
+
+
+
 }
 
 export default Sidebar

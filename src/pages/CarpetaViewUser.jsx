@@ -33,12 +33,17 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+
+
+
 
 import { supabase } from "../supabase";
 
 
 // Vistas
-
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
 import RutaBreadcrumbs from "../components/RutaBreadcrumbs";
 import { useRuta } from "../hooks/useRuta";
 
@@ -75,28 +80,27 @@ export default function CarpetaView() {
     const [nuevoNombre, setNuevoNombre] = useState("");
 
 
-    const [userId, setUserId] = useState(null);
 
 
 
+
+    
     const fetchSubcarpetas = async () => {
-        if (!userId) return;
-
         setLoading(true);
 
-        let query = supabase
+        if (!id) {
+            setSubcarpetas([]);
+            setLoading(false);
+            return;
+        }
+        const carpetaId = id ? Number(id) : null;
+        if (isNaN(carpetaId)) return;
+        
+        const { data, error } = await supabase
             .from("carpeta")
             .select("id_carpeta, nombre, fecha_creacion")
-            .eq("id_usuario_fk", userId)
+            .eq("padre", id)
             .order("nombre");
-
-        if (id) {
-            query = query.eq("padre", id);
-        } else {
-            query = query.is("padre", null); // carpeta raíz
-        }
-
-        const { data, error } = await query;
 
         if (error) {
             console.error("Error subcarpetas:", error);
@@ -107,6 +111,7 @@ export default function CarpetaView() {
 
         setLoading(false);
     };
+
     const fetchRuta = async () => {
         if (!id) {
             setRuta([]);
@@ -139,22 +144,34 @@ export default function CarpetaView() {
     };
 
 
+
+
+
+
     const handleOpenCarpeta = (id) => {
         navigate(`/dashboard/carpeta/${id}`);
     };
 
     const handleCreateCarpeta = async () => {
+
         if (!nombreCarpeta.trim()) {
             setErrorNombre("El nombre es obligatorio");
+            return;
+        }
+
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            console.error("Usuario no autenticado");
             return;
         }
 
         const { data, error } = await supabase
             .from("carpeta")
             .insert({
-            nombre: nombreCarpeta,
-            padre: id,
-            id_usuario_fk: userId   // 🔥 IMPORTANTE
+                nombre: nombreCarpeta,
+                padre: id,
+                id_usuario_fk: user.id   // 👈 IMPORTANTE
             })
             .select()
             .single();
@@ -173,6 +190,12 @@ export default function CarpetaView() {
 
 
     const handleUploadArchivo = async (e) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            console.error("No hay usuario autenticado");
+            return;
+        }
+
         const file = e.target.files[0];
         if (!file) return;
 
@@ -203,7 +226,8 @@ export default function CarpetaView() {
                 nombre: file.name,
                 storage_path: filePath,
                 tamano: file.size,
-                id_carpeta_fk: id
+                id_carpeta_fk: id,
+                id_usuario_fk: user.id
             });
 
         if (insertError) {
@@ -216,28 +240,26 @@ export default function CarpetaView() {
 
 
     const fetchArchivos = async () => {
-        if (!id || !userId) return;
+        if (!id) {
+            setArchivos([]);
+            return;
+        }
+
+        const carpetaId = Number(id);
+        if (isNaN(carpetaId)) return;
 
         const { data, error } = await supabase
             .from("archivo")
-            .select(`
-                id_archivo,
-                nombre,
-                tamano,
-                fecha,
-                storage_path,
-                carpeta!inner(id_usuario_fk)
-            `)
+            .select("id_archivo, nombre, tamano, fecha, storage_path")
             .eq("id_carpeta_fk", id)
-            .eq("carpeta.id_usuario_fk", userId)
             .order("fecha", { ascending: false });
-
         if (error) {
             console.error(error);
             setArchivos([]);
         } else {
             setArchivos(data || []);
         }
+
     };
 
     const downloadFile = async (storagePath, nombre) => {
@@ -375,32 +397,22 @@ export default function CarpetaView() {
 
     //USES EFFECT
     useEffect(() => {
-        const getUser = async () => {
-            const { data } = await supabase.auth.getUser();
-            if (data?.user) {
-                setUserId(data.user.id);
-            }
-        };
-        getUser();
-    }, []);
+    fetchSubcarpetas();
+    fetchArchivos();
 
-    useEffect(() => {
-        if (!userId) return;
-
-        fetchSubcarpetas();
-        fetchArchivos();
-
-        if (id) {
-            fetchRuta();
-        } else {
-            setRuta([]);
-        }
-    }, [id, userId]);
+    if (id) {
+        fetchRuta();
+    } else {
+        setRuta([]);
+    }
+    }, [id]);
 
 
 return (
     <Box>
+        <Navbar />
         <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f5f7fa" }}>
+            <Sidebar/>
             <Box 
                 sx={{
                 flexGrow: 1,
@@ -411,7 +423,7 @@ return (
                 <Typography
                     variant="h5"
                     sx={{ mb: 2, fontWeight: "bold", color: theme.palette.text.primary }}>
-                    Bienvenido a tu carpeta
+                    Explorador de carpetas
                 </Typography>
                 
                 {/* ===== RUTA DE NAVEGACIÓN (BREADCRUMBS) ===== */}
@@ -511,9 +523,7 @@ return (
                                             {carpeta.nombre}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                            {new Date(
-                                            carpeta.created_at
-                                            ).toLocaleDateString()}
+                                            {carpeta.fecha_creacion ? new Date(carpeta.fecha_creacion).toLocaleDateString() : 'Sin fecha'}
                                         </Typography>
                                     </Box>
                                 </Grid>
@@ -556,18 +566,18 @@ return (
                                         {archivo.nombre}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                        {(archivo.size / 1024).toFixed(2)} KB ·{" "}
-                                        {new Date(archivo.created_at).toLocaleDateString()}
+                                        {(archivo.tamano / 1024).toFixed(2)} KB ·{" "}
+                                        {archivo.fecha ? new Date(archivo.fecha).toLocaleDateString() : 'Sin fecha'}
                                         </Typography>
                                     </Box>
                                     <IconButton size="small" onClick={() => downloadFile(archivo.storage_path, archivo.nombre)}>
-                                        <InsertDriveFileIcon />
+                                        <ArrowDownwardOutlinedIcon  sx={{ color: '#3988BD' }}  />
                                     </IconButton>
                                     <IconButton
                                         size="small"
                                         onClick={() => handleDeleteArchivo(archivo)}
                                     >
-                                        <DeleteIcon />
+                                        <DeleteIcon sx={{ color: '#ff5733' }} />
                                     </IconButton>
                                 </Box>
                             </Grid>

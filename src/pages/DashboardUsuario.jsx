@@ -65,7 +65,7 @@ export default function DashboardAdmin() {
   }, [navigate]);
 
   const handleOpenCarpeta = (carpetaId) => {
-    navigate(`/dashboard/carpeta/${carpetaId}`);
+    navigate(`/dashboard/carpetas/${carpetaId}`);
   };
 
   return (

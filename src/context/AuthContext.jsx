@@ -1,25 +1,27 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../supabase'
+import { supabase } from "../supabase";
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)        // auth.users
-  const [profile, setProfile] = useState(null)  // tabla usuario
+  const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 1️⃣ Obtener sesión inicial
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null)
+    // Obtener sesión inicial
+    const getInitialSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      setUser(session?.user ?? null)
       setLoading(false)
-    })
+    }
 
-    // 2️⃣ Escuchar cambios de auth
+    getInitialSession()
+
+    // Escuchar cambios
     const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         setUser(session?.user ?? null)
-        setLoading(false)
       }
     )
 
@@ -28,21 +30,24 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  // 3️⃣ Cargar perfil cuando haya user
+  // Cargar perfil cuando user cambie
   useEffect(() => {
-    if (!user) {
-      setProfile(null)
-      return
-    }
-
     const loadProfile = async () => {
+      if (!user) {
+        setProfile(null)
+        return
+      }
+
+      setLoading(true)
+
       const { data, error } = await supabase
-        .from('usuario')
-        .select('*')
-        .eq('id_usuario', user.id)
+        .from("usuario")
+        .select("*")
+        .eq("id_usuario", user.id)
         .single()
 
       if (!error) setProfile(data)
+      setLoading(false)
     }
 
     loadProfile()
@@ -53,7 +58,7 @@ export function AuthProvider({ children }) {
     profile,
     loading,
     isAuthenticated: !!user,
-    isAdmin: profile?.tipo === 'admin',
+    isAdmin: profile?.tipo === "admin",
     signOut: () => supabase.auth.signOut()
   }
 

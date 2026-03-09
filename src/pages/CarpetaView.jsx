@@ -33,6 +33,10 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+
+
+
 
 import { supabase } from "../supabase";
 
@@ -499,9 +503,7 @@ return (
                                             {carpeta.nombre}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                            {new Date(
-                                            carpeta.created_at
-                                            ).toLocaleDateString()}
+                                            {new Date(carpeta.fecha_creacion).toLocaleDateString()}
                                         </Typography>
                                     </Box>
                                 </Grid>
@@ -544,18 +546,18 @@ return (
                                         {archivo.nombre}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
-                                        {(archivo.size / 1024).toFixed(2)} KB ·{" "}
-                                        {new Date(archivo.created_at).toLocaleDateString()}
+                                        {(archivo.tamano / 1024).toFixed(2)} KB ·{" "}
+                                        {archivo.fecha ? new Date(archivo.fecha).toLocaleDateString() : 'Sin fecha'}
                                         </Typography>
                                     </Box>
                                     <IconButton size="small" onClick={() => downloadFile(archivo.storage_path, archivo.nombre)}>
-                                        <InsertDriveFileIcon />
+                                        <ArrowDownwardOutlinedIcon  sx={{ color: '#3988BD' }}  />
                                     </IconButton>
                                     <IconButton
                                         size="small"
                                         onClick={() => handleDeleteArchivo(archivo)}
                                     >
-                                        <DeleteIcon />
+                                        <DeleteIcon sx={{ color: '#ff5733' }} />
                                     </IconButton>
                                 </Box>
                             </Grid>
