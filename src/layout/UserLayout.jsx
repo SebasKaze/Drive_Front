@@ -8,7 +8,7 @@ export default function UserLayout() {
 
     <Box>
       <Navbar />
-      <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f5f7fa" }}>
+      <Box sx={{ display: "flex", minHeight: "93vh", bgcolor: "#f5f7fa" }}>
         <Sidebar userRole="user" />
         <Box sx={{ flexGrow: 1, p: 3, width: "100%", overflow: "hidden",}}>
           <Box sx={{ p: 4 }}>

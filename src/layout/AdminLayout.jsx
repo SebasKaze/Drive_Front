@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 
 export default function AdminLayout() {
   return (
-    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <Box sx={{ minHeight: "93vh", display: "flex", flexDirection: "column" }}>
       <Navbar />
 
       <Box sx={{ display: "flex", flex: 1, bgcolor: "#f5f7fa" }}>

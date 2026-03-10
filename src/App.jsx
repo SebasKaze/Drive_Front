@@ -64,7 +64,7 @@ function App() {
                         <Route path="/" element={<RootRedirect />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/dashboard/carpeta/:id" element={<CarpetaView />} />
-                        <Route path="/dashboard/carpetas/:id" element={<CarpetaViewUser />} />
+                        <Route path="/dashboards/carpetas/:id" element={<CarpetaViewUser />} />
                         <Route path="/home" element={<Home/>}/>
                         {/* ADMIN (Rutas protegidas) */}
                         

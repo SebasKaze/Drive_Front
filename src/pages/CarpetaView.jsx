@@ -149,16 +149,25 @@ export default function CarpetaView() {
     };
 
     const handleCreateCarpeta = async () => {
+
         if (!nombreCarpeta.trim()) {
             setErrorNombre("El nombre es obligatorio");
+            return;
+        }
+
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            console.error("Usuario no autenticado");
             return;
         }
 
         const { data, error } = await supabase
             .from("carpeta")
             .insert({
-            nombre: nombreCarpeta,
-            padre: id,
+                nombre: nombreCarpeta,
+                padre: id,
+                id_usuario_fk: user.id   // 👈 IMPORTANTE
             })
             .select()
             .single();
@@ -391,7 +400,7 @@ export default function CarpetaView() {
 return (
     <Box>
         <Navbar />
-        <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f5f7fa" }}>
+        <Box sx={{ display: "flex", minHeight: "93vh", bgcolor: "#f5f7fa" }}>
             <Sidebar/>
             <Box 
                 sx={{
@@ -416,7 +425,7 @@ return (
                     mb: 4,
                     borderRadius: 3,
                     border: `1px solid ${theme.palette.divider}`,
-                    height: "calc(100vh - 180px)", // ajusta este número si quieres más/menos alto
+                    height: "calc(92vh - 180px)", // ajusta este número si quieres más/menos alto
                     display: "flex",
                     flexDirection: "column",
                     overflow: "hidden",

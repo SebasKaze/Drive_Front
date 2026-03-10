@@ -84,7 +84,7 @@ export default function CrearEmpresa() {
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f5f7fa" }}>
+    <Box sx={{ display: "flex", minHeight: "93vh", bgcolor: "#f5f7fa" }}>
       <Box sx={{ flexGrow: 1 }}>
         <Box sx={{ p: 4 }}>
           <Paper sx={{ maxWidth: 600, mx: "auto", p: 4 }}>
