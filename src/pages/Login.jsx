@@ -47,7 +47,6 @@ export default function Login() {
       return
     }
 
-  
     const { data: perfil, error: perfilError } = await supabase
       .from('usuario')
       .select('tipo')
@@ -66,11 +65,8 @@ export default function Login() {
       navigate('/user')
     }
 
-
     setLoading(false)
   }
-
-  
 
   return (
     <Box
@@ -79,7 +75,7 @@ export default function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: '#f3f4f6'
+        bgcolor: '#C7E1FF' // Fondo azul muy claro
       }}
     >
       <Paper
@@ -88,14 +84,34 @@ export default function Login() {
           maxWidth: 400,
           width: '100%',
           p: 4,
-          borderRadius: 3
+          borderRadius: 3,
+          borderTop: '4px solid #f57c00' // Detalle naranja en la parte superior
         }}
       >
-        <Typography variant="h4" align="center" fontWeight="bold" mb={1}>
+        {/* Título principal CMB Drive en naranja */}
+        <Typography
+          variant="h4"
+          align="center"
+          sx={{ color: '#f57c00', fontWeight: 'bold' }}
+        >
+          CMB Drive
+        </Typography>
+
+        <Typography
+          variant="h5"
+          align="center"
+          fontWeight="medium"
+          mt={1}
+        >
           Iniciar Sesión
         </Typography>
 
-        <Typography variant="body2" align="center" mb={3} color="text.secondary">
+        <Typography
+          variant="body2"
+          align="center"
+          mb={3}
+          color="text.secondary"
+        >
           Accede a tu espacio de trabajo
         </Typography>
 
@@ -114,6 +130,13 @@ export default function Login() {
             value={formData.correo}
             onChange={handleChange}
             required
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: '#1976d2' // Borde azul al enfocar
+                }
+              }
+            }}
           />
 
           <TextField
@@ -125,13 +148,28 @@ export default function Login() {
             value={formData.password}
             onChange={handleChange}
             required
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: '#1976d2' // Borde azul al enfocar
+                }
+              }
+            }}
           />
 
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, py: 1.4, fontWeight: 'bold' }}
+            sx={{
+              mt: 3,
+              py: 1.4,
+              fontWeight: 'bold',
+              bgcolor: '#f57c00', // Naranja principal
+              '&:hover': {
+                bgcolor: '#e65100' // Naranja más oscuro al pasar el mouse
+              }
+            }}
             disabled={loading}
           >
             {loading ? (
@@ -145,5 +183,3 @@ export default function Login() {
     </Box>
   )
 }
-
-
