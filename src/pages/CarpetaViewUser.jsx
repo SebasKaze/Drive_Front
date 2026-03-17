@@ -46,6 +46,7 @@ import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import RutaBreadcrumbs from "../components/RutaBreadcrumbs";
 import { useRuta } from "../hooks/useRuta";
+import { blueGrey, orange } from "@mui/material/colors";
 
 export default function CarpetaView() {
     const { id } = useParams();
@@ -149,7 +150,7 @@ export default function CarpetaView() {
 
 
     const handleOpenCarpeta = (id) => {
-        navigate(`/dashboard/carpeta/${id}`);
+        navigate(`/dashboards/carpetas/${id}`);
     };
 
     const handleCreateCarpeta = async () => {
@@ -436,10 +437,10 @@ return (
                     mb: 4,
                     borderRadius: 3,
                     border: `1px solid ${theme.palette.divider}`,
-                    height: "calc(92vh - 180px)", // ajusta este número si quieres más/menos alto
+                    height: "calc(96vh - 180px)", // ajusta este número si quieres más/menos alto
                     display: "flex",
                     flexDirection: "column",
-                    overflow: "hidden",
+                    overflow: "auto",
                     }}>
                     {/*TITULO Y CONTENEDOR DE LOS BOTONES*/}
                     <Stack
@@ -479,7 +480,7 @@ return (
                         </Box>
                     </Stack>
                     {/* ===== VER CARPETAS ===== */}
-                    <Box sx={{ maxHeight: "260px", overflowY: "auto", pr: 1 }}>
+                    <Box sx={{ flex: 1, overflowY: "auto", pr: 1, minHeight: 0, }}>
                         {loading && <Typography variant="body2">Cargando...</Typography>}
                         {!loading && subcarpetas.length === 0 && (
                             <Typography variant="body2" color="text.secondary">
@@ -531,7 +532,7 @@ return (
                         </Grid>
                     </Box>
                     {/* ===== VER ARCHIVOS ===== */}
-                    <Box sx={{ mt: 4 }}>
+                    <Box sx={{p:3,flex: 1, overflowY: "auto", mt: 2, minHeight: 0,  borderRadius:2,border: "1px solid", borderColor: "grey.300" }}>
                         <Typography
                             variant="subtitle1"
                             sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}

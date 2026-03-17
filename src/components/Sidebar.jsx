@@ -64,7 +64,7 @@ const Sidebar = () => {
     <Box
       sx={{
         width: collapsed ? 80 : 260,
-        height: "93vh",
+        height: "auto",
         display: "flex",
         flexDirection: "column",
         bgcolor: "#ffca3a",

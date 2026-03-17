@@ -13,7 +13,7 @@ const Home = () => {
   return (
     <Box>
       <Navbar />
-      <Box sx={{ display: "flex", minHeight: "70vh", bgcolor: "#ffffff" }}>
+      <Box sx={{ display: "flex", minHeight: "90vh", bgcolor: "#ffffff" }}>
         <Sidebar />
         <Box sx={{flexGrow: 1, p: 3, width: "100%", overflow: "hidden",}}>
           

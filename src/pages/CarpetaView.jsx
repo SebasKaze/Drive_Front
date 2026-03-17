@@ -425,10 +425,10 @@ return (
                     mb: 4,
                     borderRadius: 3,
                     border: `1px solid ${theme.palette.divider}`,
-                    height: "calc(92vh - 180px)", // ajusta este número si quieres más/menos alto
+                    height: "calc(96vh - 180px)", // ajusta este número si quieres más/menos alto
                     display: "flex",
                     flexDirection: "column",
-                    overflow: "hidden",
+                    overflow: "auto",
                     }}>
                     {/*TITULO Y CONTENEDOR DE LOS BOTONES*/}
                     <Stack
@@ -520,7 +520,7 @@ return (
                         </Grid>
                     </Box>
                     {/* ===== VER ARCHIVOS ===== */}
-                    <Box sx={{ mt: 4 }}>
+                    <Box sx={{p:3,flex: 1, overflowY: "auto", mt: 2, minHeight: 0,  borderRadius:2,border: "1px solid", borderColor: "grey.300" }}>
                         <Typography
                             variant="subtitle1"
                             sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}
