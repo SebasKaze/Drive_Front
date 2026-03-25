@@ -57,7 +57,7 @@ const Sidebar = () => {
 
   const navItems = [
     { text: "Inicio", icon: <HomeIcon />, path: "/home" },
-    { text: "Papelera", icon: <DeleteIcon />, path: "/trash" }
+    { text: "Papelera", icon: <DeleteIcon />, path: "/papelera" }
   ]
 
   return (

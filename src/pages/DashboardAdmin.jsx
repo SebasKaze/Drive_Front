@@ -67,7 +67,7 @@ export default function DashboardAdmin() {
   };
 
   return (
-    <Box sx={{ animation: "fadeIn 0.5s ease-in" }}>
+    <Box sx={{ animation: "fadeIn 0.5s ease-in" , minHeight: "85vh"}}>
       <Typography
         component="div"
         variant="h5"

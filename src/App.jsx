@@ -13,6 +13,7 @@ import UserLayout from "./layout/UserLayout";
 import CarpetaView from "./pages/CarpetaView";
 import Perfil from "./components/Perfil";
 import CarpetaViewUser from "./pages/CarpetaViewUser";
+import Papelera from "./pages/Papelera";
 
 
 
@@ -65,6 +66,7 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/dashboard/carpeta/:id" element={<CarpetaView />} />
                         <Route path="/dashboards/carpetas/:id" element={<CarpetaViewUser />} />
+                        <Route path="/papelera" element={<Papelera/>}/>
                         <Route path="/home" element={<Home/>}/>
                         {/* ADMIN (Rutas protegidas) */}
                         
